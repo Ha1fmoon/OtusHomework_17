@@ -1,6 +1,6 @@
 ﻿namespace OtusHomework_17;
 
-public class EmployeeTree
+public class EmployeesTree
 {
     private Node? _root;
 
@@ -8,7 +8,7 @@ public class EmployeeTree
     {
         var node = new Node
         {
-            Name = name, 
+            Name = name,
             Salary = salary
         };
 
@@ -19,6 +19,24 @@ public class EmployeeTree
         }
 
         AddNode(_root, node);
+    }
+
+    public string? FindBySalary(int salary)
+    {
+        var employee = TryGetNodeBySalary(_root, salary);
+        return employee?.Name;
+    }
+
+    public List<Employee> GetEmployeesSortedList()
+    {
+        var result = new List<Employee>();
+        GetInOrder(_root, result);
+        return result;
+    }
+
+    public void Clear()
+    {
+        _root = null;
     }
 
     private void AddNode(Node rootNode, Node newNode)
@@ -39,40 +57,21 @@ public class EmployeeTree
         }
     }
 
-    public string? FindBySalary(int salary)
+    private Node? TryGetNodeBySalary(Node? rootNode, int salary)
     {
-        var employee = FindNodeBySalary(_root, salary);
-        return employee?.Name;
+        if (rootNode == null) return null;
+
+        if (rootNode.Salary == salary) return rootNode;
+
+        return TryGetNodeBySalary(salary < rootNode.Salary ? rootNode.Left : rootNode.Right, salary);
     }
 
-    private Node? FindNodeBySalary(Node? currentNode, int salary)
+    private void GetInOrder(Node? node, List<Employee> result)
     {
-        if (currentNode == null) return null;
+        if (node == null) return;
 
-        if (currentNode.Salary == salary) return currentNode;
-
-        return FindNodeBySalary(salary < currentNode.Salary ? currentNode.Left : currentNode.Right, salary);
-    }
-
-    public List<(string Name, int Salary)> GetEmployeesSortedList()
-    {
-        var result = new List<(string Name, int Salary)>();
-        InOrderTraversal(_root, result);
-        return result;
-    }
-
-    private void InOrderTraversal(Node? node, List<(string Name, int Salary)> result)
-    {
-        if (node == null)
-            return;
-
-        InOrderTraversal(node.Left, result);
-        result.Add((node.Name, node.Salary));
-        InOrderTraversal(node.Right, result);
-    }
-
-    public void Clear()
-    {
-        _root = null;
+        GetInOrder(node.Left, result);
+        result.Add(new Employee { Name = node.Name, Salary = node.Salary });
+        GetInOrder(node.Right, result);
     }
 }
